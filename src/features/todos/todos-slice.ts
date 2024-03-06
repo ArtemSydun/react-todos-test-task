@@ -1,4 +1,3 @@
-/* eslint-disable no-shadow */
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { Todo } from '../../types/todo'
 
@@ -40,7 +39,9 @@ export const todoSlice = createSlice({
     },
 
     'toggleTodo': (state, action: PayloadAction<Todo>): void => {
-      const todo = state.todos.find((todo) => action.payload.id === todo.id)
+      const todo = state.todos.find(
+        (todoToToggle) => action.payload.id === todoToToggle.id,
+      )
       if (todo) {
         todo.completed = !todo.completed
       }

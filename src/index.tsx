@@ -1,4 +1,3 @@
-/* eslint-disable import/no-unresolved */
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import 'bulma/css/bulma.css'

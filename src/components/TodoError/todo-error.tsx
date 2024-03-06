@@ -3,19 +3,19 @@ import cn from 'classnames'
 import { Errors } from '../../types/errors'
 
 type Props = {
-  errorType: Errors | null
-  setErrorType: (error: Errors | null) => void
+  errorType: Errors | undefined
+  setError: (error: Errors | undefined) => void
 }
 
 export const TodoError: React.FC<Props> = ({
   errorType,
-  setErrorType,
+  setError,
 }) => {
   useEffect(() => {
     setTimeout(() => {
-      setErrorType(null)
+      setError(undefined)
     }, 3000)
-  }, [setErrorType])
+  }, [setError])
 
   return (
     <div
@@ -27,9 +27,8 @@ export const TodoError: React.FC<Props> = ({
         data-cy="HideErrorButton"
         type="button"
         className="delete"
-        onClick={() => setErrorType(null)}
+        onClick={(): void => setError(undefined)}
       />
-      {/* show only one message at a time */}
       {`${errorType}`}
     </div>
   )

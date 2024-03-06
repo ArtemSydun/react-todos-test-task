@@ -1,13 +1,24 @@
 import React, { useState } from 'react'
 import { useAppDispatch } from '../../hooks/redux-hooks'
 import { addTodo } from '../../features/todos/todos-slice'
+import { Errors } from '../../types/errors'
 
-export const TodoHeader: React.FC = () => {
+type Props = {
+  setError: (error: Errors) => void
+}
+
+export const TodoHeader: React.FC<Props> = ({ setError }) => {
   const [newTodo, setNewTodo] = useState('')
   const dispatch = useAppDispatch()
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault()
+    if (newTodo.trim().length === 0) {
+      setError(Errors.EmptyTitle)
+    }
+    if (newTodo.trim().length > 15) {
+      setError(Errors.Add)
+    }
     if (newTodo.trim()) {
       dispatch(addTodo({
         'id': Math.floor(
@@ -21,12 +32,6 @@ export const TodoHeader: React.FC = () => {
   }
   return (
     <header className="todoapp__header">
-      <button
-        type="button"
-        className="todoapp__toggle-all active"
-        data-cy="ToggleAllButton"
-      />
-
       <form onSubmit={handleSubmit}>
         <input
           data-cy="NewTodoField"
