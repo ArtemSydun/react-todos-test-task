@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import cn from 'classnames'
 import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks'
-import { removeTodo } from '../../features/todos/todos-slice'
+import { removeTodo, toggleTodo } from '../../features/todos/todos-slice'
 import { Todo } from '../../types/todo'
 import { Filter } from '../../types/filter'
 
@@ -51,20 +51,27 @@ export const TodoList: React.FC<Props> = ({
             className={cn('todo', { completed })}
             key={id}
           >
-            {/* overlay will cover the todo while it is being updated */}
-            <div data-cy="TodoLoader" className="modal overlay">
-              <div className="modal-background has-background-white-ter" />
-              <div className="loader" />
-            </div>
-            <label className="todo__status-label">
+            <label
+              className="todo__status-label"
+
+            >
               <input
                 data-cy="TodoStatus"
                 type="checkbox"
                 className="todo__status"
+                onClick={(): void => {
+                  dispatch(toggleTodo(todo))
+                }}
               />
             </label>
 
-            <span data-cy="TodoTitle" className="todo__title">
+            <span
+              data-cy="TodoTitle"
+              className="todo__title"
+              onClick={(): void => {
+                dispatch(toggleTodo(todo))
+              }}
+            >
               {title}
             </span>
 
@@ -76,12 +83,6 @@ export const TodoList: React.FC<Props> = ({
             >
               ×
             </button>
-
-            {/* overlay will cover the todo while it is being updated */}
-            <div data-cy="TodoLoader" className="modal overlay">
-              <div className="modal-background has-background-white-ter" />
-              <div className="loader" />
-            </div>
           </div>
         )
       })}
