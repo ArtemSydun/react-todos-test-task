@@ -13,13 +13,8 @@ export const TodoHeader: React.FC<Props> = ({ setError }) => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault()
-    if (newTodo.trim().length === 0) {
-      setError(Errors.EmptyTitle)
-    }
-    if (newTodo.trim().length > 15) {
-      setError(Errors.Add)
-    }
-    if (newTodo.trim()) {
+
+    if (newTodo.trim() && newTodo.trim().length < 15) {
       dispatch(addTodo({
         'id': Math.floor(
           Math.random() * 1000,
@@ -28,6 +23,13 @@ export const TodoHeader: React.FC<Props> = ({ setError }) => {
         'completed': false,
       }))
       setNewTodo('')
+    } else {
+      setNewTodo('')
+      setError(Errors.Add)
+    }
+
+    if (newTodo.trim().length === 0) {
+      setError(Errors.EmptyTitle)
     }
   }
   return (
