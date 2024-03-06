@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import './app.css'
 import { TodoHeader } from './components/TodoHeader/todo-header'
 import { TodoList } from './components/TodoList/todo-list'
 import { TodoFooter } from './components/TodoFooter/todo-footer'
