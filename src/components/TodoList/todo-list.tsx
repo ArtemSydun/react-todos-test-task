@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import cn from 'classnames'
-import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks'
-import { removeTodo, toggleTodo } from '../../features/todos/todos-slice'
 import { Todo } from '../../types/todo'
 import { Filter } from '../../types/filter'
+
+import * as api from '../../todos'
 
 type Props = {
   filterBy: Filter
@@ -12,33 +12,42 @@ type Props = {
 export const TodoList: React.FC<Props> = ({
   filterBy,
 }) => {
-  const todoList = useAppSelector((state) => state.todos)
-  const dispatch = useAppDispatch()
-
   const handleDeleteTodo = (todo: Todo): void => {
-    dispatch(removeTodo(todo))
+    api.deleteTodo(todo.id)
+    setVisibleTodos(visibleTodos.filter((visibleTodo) => todo.id !==
+      visibleTodo.id))
+  }
+
+  const handleUpdateTodo = async (todo: Todo): Promise<void> => {
+    try {
+      await api.updateTodo(todo.id, todo.title, !todo.completed)
+
+      const updatedTodos = visibleTodos.map((thisTodo) => {
+        if (thisTodo.id === todo.id) {
+          return { ...thisTodo, 'completed': !todo.completed }
+        }
+        return thisTodo
+      })
+
+      setVisibleTodos(updatedTodos)
+    } catch (error) {
+      console.error('Error updating todo:', error)
+    }
   }
 
   const [visibleTodos, setVisibleTodos] = useState<Todo[]>([])
 
   useEffect(() => {
-    switch (filterBy) {
-      case Filter.Completed: {
-        setVisibleTodos(todoList.todos.filter((todo) => todo.completed))
-        break
-      }
-
-      case Filter.Active: {
-        setVisibleTodos(todoList.todos.filter((todo) => !todo.completed))
-        break
-      }
-
-      default: {
-        setVisibleTodos(todoList.todos)
-        break
+    const getTodos = async (): Promise<void> => {
+      try {
+        const todos = await api.getAll()
+        setVisibleTodos(todos)
+      } catch (error) {
+        console.log(error)
       }
     }
-  }, [filterBy, todoList])
+    getTodos()
+  }, [])
 
   return (
     <section className="todoapp__main" data-cy="TodoList">
@@ -60,7 +69,7 @@ export const TodoList: React.FC<Props> = ({
                 type="checkbox"
                 className="todo__status"
                 onClick={(): void => {
-                  dispatch(toggleTodo(todo))
+                  handleUpdateTodo(todo)
                 }}
               />
             </label>
@@ -69,7 +78,7 @@ export const TodoList: React.FC<Props> = ({
               data-cy="TodoTitle"
               className="todo__title"
               onClick={(): void => {
-                dispatch(toggleTodo(todo))
+                handleUpdateTodo(todo)
               }}
             >
               {title}

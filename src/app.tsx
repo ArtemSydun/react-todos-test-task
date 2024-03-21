@@ -1,10 +1,11 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { TodoHeader } from './components/TodoHeader/todo-header'
 import { TodoList } from './components/TodoList/todo-list'
 import { TodoFooter } from './components/TodoFooter/todo-footer'
 import { Filter } from './types/filter'
 import { TodoError } from './components/TodoError/todo-error'
 import { Errors } from './types/errors'
+import { Todo } from './types/todo'
 
 export const App: React.FC = () => {
   const [filterBy, setFilterBy] = useState<Filter>(Filter.All)
