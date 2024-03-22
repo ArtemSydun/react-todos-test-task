@@ -1,28 +1,44 @@
-/* eslint-disable promise/prefer-await-to-then */
 import axios from 'axios'
 import { Todo } from './types/todo'
 
 axios.defaults.baseURL = 'http://localhost:3005'
 
-export function getAll(): Promise<Todo[]> {
-  return axios.get('http://localhost:3005/todos')
-    .then((res) => res.data)
+export async function getAll(): Promise<Todo[]> {
+  try {
+    const res = await axios.get('/todos')
+    return res.data
+  } catch {
+    throw new Error('Failed to fetch todos')
+  }
 }
 
-export function addTodo(title: string): Promise<Todo> {
-  return axios.post('http://localhost:3005/todos', {
-    title,
-  })
+export async function addTodo(title: string): Promise<Todo> {
+  try {
+    const res = await axios.post('/todos', { title })
+    return res.data
+  } catch {
+    throw new Error('Failed to add todo')
+  }
 }
 
-export function deleteTodo(id: number): void {
-  axios.delete(`http://localhost:3005/todos/${id}`)
+export async function deleteTodo(id: string): Promise<void> {
+  try {
+    await axios.delete(`/todos/${id}`)
+  } catch {
+    throw new Error('Failed to delete todo')
+  }
 }
 
-export function updateTodo(
-  id: number,
-  title: string,
-  completed: boolean,
-): Promise<Todo> {
-  return axios.put(`http://localhost:3005/todos/${id}`, { title, completed })
+export async function updateTodo(todo: Todo): Promise<Todo> {
+  try {
+    const { id, title, completed } = todo
+    const newCompleted = !completed
+    const res = await axios.put(`/todos/${id}`, {
+      title,
+      'completed': newCompleted,
+    })
+    return res.data
+  } catch {
+    throw new Error('Failed to update todo')
+  }
 }

@@ -1,69 +1,63 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import cn from 'classnames'
 import { Todo } from '../../types/todo'
 import { Filter } from '../../types/filter'
 
 import * as api from '../../todos'
 
+import { useMutation, useQuery, useQueryClient } from 'react-query'
+
 type Props = {
   filterBy: Filter
 }
 
-export const TodoList: React.FC<Props> = ({
-  filterBy,
-}) => {
-  const handleDeleteTodo = (todo: Todo): void => {
-    api.deleteTodo(todo.id)
-    setVisibleTodos(visibleTodos.filter((visibleTodo) => todo.id !==
-      visibleTodo.id))
+export const TodoList: React.FC<Props> = ({ filterBy }) => {
+  const queryClient = useQueryClient()
+
+  const { 'data': todos, isLoading } = useQuery({
+    'queryFn': () => api.getAll(),
+    'queryKey': ['todos'],
+  })
+
+  const { 'mutateAsync': deleteTodoMutation } = useMutation({
+    'mutationFn': api.deleteTodo,
+    'onSuccess': () => {
+      queryClient.invalidateQueries(['todos'])
+    },
+  })
+
+  const { 'mutateAsync': updateTodoMutation } = useMutation({
+    'mutationFn': api.updateTodo,
+    'onSuccess': () => {
+      queryClient.invalidateQueries(['todos'])
+    },
+  })
+
+  const handleDeleteTodo = async (id: string): Promise<void> => {
+    event?.preventDefault()
+    try {
+      await deleteTodoMutation(id)
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   const handleUpdateTodo = async (todo: Todo): Promise<void> => {
+    event?.preventDefault()
     try {
-      await api.updateTodo(todo.id, todo.title, !todo.completed)
-
-      const updatedTodos = visibleTodos.map((thisTodo) => {
-        if (thisTodo.id === todo.id) {
-          return { ...thisTodo, 'completed': !todo.completed }
-        }
-        return thisTodo
-      })
-
-      setVisibleTodos(updatedTodos)
+      await updateTodoMutation(todo)
     } catch (error) {
-      console.error('Error updating todo:', error)
+      console.log(error)
     }
   }
 
-  const [visibleTodos, setVisibleTodos] = useState<Todo[]>([])
-
-  useEffect(() => {
-    const getTodos = async (): Promise<void> => {
-      try {
-        const todos = await api.getAll()
-        setVisibleTodos(todos)
-      } catch (error) {
-        console.log(error)
-      }
-    }
-    getTodos()
-  }, [])
-
   return (
     <section className="todoapp__main" data-cy="TodoList">
-      {visibleTodos.map((todo) => {
+      {isLoading ? <>Loading</> : todos?.map((todo: Todo) => {
         const { title, id, completed } = todo
-
         return (
-          <div
-            data-cy="Todo"
-            className={cn('todo', { completed })}
-            key={id}
-          >
-            <label
-              className="todo__status-label"
-
-            >
+          <div data-cy="Todo" className={cn('todo', { completed })} key={id}>
+            <label className="todo__status-label">
               <input
                 data-cy="TodoStatus"
                 type="checkbox"
@@ -88,13 +82,14 @@ export const TodoList: React.FC<Props> = ({
               type="button"
               className="todo__remove"
               data-cy="TodoDelete"
-              onClick={(): void => handleDeleteTodo(todo)}
+              onClick={(): Promise<void> => handleDeleteTodo(id)}
             >
-              ×
+                ×
             </button>
           </div>
         )
-      })}
+      })
+      }
     </section>
   )
 }

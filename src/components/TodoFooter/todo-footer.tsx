@@ -1,7 +1,5 @@
 import React from 'react'
 import cn from 'classnames'
-import { useAppDispatch, useAppSelector } from '../../hooks/redux-hooks'
-import { clearCompleted } from '../../features/todos/todos-slice'
 import { Filter } from '../../types/filter'
 
 type Props = {
@@ -10,24 +8,14 @@ type Props = {
 }
 
 export const TodoFooter: React.FC<Props> = ({ setFilterBy, filterBy }) => {
-  const todos = useAppSelector((state) => state.todos)
-  const dispatch = useAppDispatch()
-
-  const activeCount = todos.todos.filter((todo) => !todo.completed).length
-  const completedCount = todos.todos.filter((todo) => todo.completed).length
-
-  const handleClearCompleted = (): void => {
-    dispatch(clearCompleted())
-  }
-
   return (
     <footer className="todoapp__footer" data-cy="Footer">
       <span className="todo-count" data-cy="TodosCounter">
-        {`${completedCount} completed`}
+        {`${1} completed`}
       </span>
 
       <span className="todo-count" data-cy="TodosCounter">
-        {`${activeCount} active`}
+        {`${1} active`}
       </span>
 
       <nav className="filter" data-cy="Filter">
@@ -69,7 +57,6 @@ export const TodoFooter: React.FC<Props> = ({ setFilterBy, filterBy }) => {
         type="button"
         className="todoapp__clear-completed"
         data-cy="ClearCompletedButton"
-        onClick={(): void => handleClearCompleted()}
       >
           Clear completed
       </button>

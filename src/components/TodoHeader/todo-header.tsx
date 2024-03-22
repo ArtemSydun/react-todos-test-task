@@ -1,28 +1,25 @@
 import React, { useState } from 'react'
-import { Errors } from '../../types/errors'
 import * as api from '../../todos'
+import { useMutation, useQueryClient } from 'react-query'
 
-type Props = {
-  setError: (error: Errors) => void
-}
-
-export const TodoHeader: React.FC<Props> = ({ setError }) => {
+export const TodoHeader: React.FC = () => {
+  const queryClient = useQueryClient()
   const [newTodo, setNewTodo] = useState('')
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
-    event.preventDefault()
+  const { 'mutateAsync': addTodoMutation } = useMutation({
+    'mutationFn': api.addTodo,
+    'onSuccess': () => {
+      queryClient.invalidateQueries(['todos'])
+    },
+  })
 
-    if (newTodo.trim() && newTodo.trim().length < 15) {
-      api.addTodo(newTodo)
-      api.getAll()
+  const handleSubmit = async (): Promise<void> => {
+    event?.preventDefault()
+    try {
+      await addTodoMutation(newTodo)
       setNewTodo('')
-    } else {
-      setNewTodo('')
-      setError(Errors.Add)
-    }
-
-    if (newTodo.trim().length === 0) {
-      setError(Errors.EmptyTitle)
+    } catch (error) {
+      console.log(error)
     }
   }
 

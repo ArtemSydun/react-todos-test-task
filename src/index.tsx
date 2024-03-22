@@ -4,18 +4,18 @@ import 'bulma/css/bulma.css'
 import '@fortawesome/fontawesome-free/css/all.css'
 import './styles/index.scss'
 import { App } from './app'
-import { Provider } from 'react-redux'
-import { store } from './store'
+import { QueryClient, QueryClientProvider } from 'react-query'
 
 const root = ReactDOM.createRoot(
   document.querySelector('#root') as HTMLElement,
 )
+
+const queryClient = new QueryClient()
+
 root.render(
   <React.StrictMode>
-    <Provider store={store}>
-
+    <QueryClientProvider client={queryClient}>
       <App />
-
-    </Provider>
+    </QueryClientProvider>
   </React.StrictMode>,
 )
